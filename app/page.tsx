@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Calculator, 
-  TrendingUp, 
-  BadgePercent, 
-  Wallet 
+import {
+  TrendingUp,
+  BadgePercent,
+  Wallet
 } from 'lucide-react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardFooter } from '@/components/ui/card';
@@ -13,6 +12,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import Image from 'next/image';
+import stocks from '../public/stocks.png';
 
 export default function DividendCalculator() {
   const [lot, setLot] = useState<string>('');
@@ -20,16 +21,16 @@ export default function DividendCalculator() {
   const [tax, setTax] = useState<boolean>(true);
 
   const formatRupiah = (num: number) => {
-    return new Intl.NumberFormat('id-ID', { 
-      style: 'currency', 
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
       currency: 'IDR',
-      maximumFractionDigits: 0 
+      maximumFractionDigits: 0
     }).format(num);
   };
 
   const lotNum = parseFloat(lot) || 0;
   const dpsNum = parseFloat(dps) || 0;
-  
+
   const totalLembar = lotNum * 100;
   const gross = totalLembar * dpsNum;
   const taxAmount = tax ? gross * 0.1 : 0;
@@ -55,15 +56,20 @@ export default function DividendCalculator() {
   return (
     // UBAHAN 1: Padding container menyesuaikan layar (p-4 di HP, md:p-8 di tablet/desktop)
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 p-4 md:p-8 dark:bg-zinc-950 transition-colors">
-      
+
       {/* UBAHAN 2: Lebar Card lebih fleksibel */}
       <Card className="w-full max-w-[340px] sm:max-w-md md:max-w-lg shadow-xl border-zinc-200 dark:border-zinc-800">
-        
+
         <CardHeader className="space-y-1 pb-4">
           <div className="flex items-center gap-3 mb-1">
-            <div className="p-2 bg-blue-100 text-blue-600 rounded-lg dark:bg-blue-900/30 dark:text-blue-400">
+            <div className="  text-blue-600 rounded-lg dark:bg-blue-900/30 dark:text-blue-400">
               {/* Icon size menyesuaikan */}
-              <Calculator className="w-5 h-5 md:w-6 md:h-6" />
+              <Image src={stocks} width={120}       // Minta Next.js merender gambar 120px (3x lebih tajam)
+                height={120}      // Sama, 120px
+                alt='stocks logo'
+                className="w-10 h-10 object-contain"
+              />
+
             </div>
             {/* Font size judul adaptif */}
             <h1 className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-zinc-50">
@@ -78,11 +84,11 @@ export default function DividendCalculator() {
         <CardContent className="space-y-5 md:space-y-6">
           {/* Input Section */}
           <div className="space-y-4">
-            
+
             {/* Input Lot */}
             <div className="grid gap-2">
               <Label htmlFor="lot" className="flex items-center gap-2 text-sm md:text-base">
-                <TrendingUp size={16} className="text-zinc-500" /> 
+                <TrendingUp size={16} className="text-zinc-500" />
                 Jumlah Lot
               </Label>
               <div className="relative">
@@ -94,7 +100,7 @@ export default function DividendCalculator() {
                   onKeyDownCapture={preventMinus}
                   onChange={(e) => handleInputChange(e.target.value, setLot)}
                   // Font size input diperbesar di desktop agar lebih jelas
-                  className="pl-4 pr-12 text-base md:text-lg font-medium h-10 md:h-11" 
+                  className="pl-4 pr-12 text-base md:text-lg font-medium h-10 md:h-11"
                 />
                 <span className="absolute right-4 top-2.5 md:top-3 text-sm text-zinc-400">Lot</span>
               </div>
@@ -148,7 +154,7 @@ export default function DividendCalculator() {
                 {formatRupiah(gross)}
               </span>
             </div>
-            
+
             {tax && (
               <div className="flex justify-between text-xs md:text-sm text-red-500/80">
                 <span>Pajak (10%)</span>
@@ -171,7 +177,7 @@ export default function DividendCalculator() {
             </div>
           </div>
         </CardContent>
-        
+
         <CardFooter className="justify-center pb-6">
           <p className="text-[10px] md:text-xs text-zinc-400 text-center">
             *Estimasi berdasarkan data input manual
