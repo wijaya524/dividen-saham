@@ -63,9 +63,8 @@ export default function DividendCalculator() {
         <CardHeader className="space-y-1 pb-4">
           <div className="flex items-center gap-3 mb-1">
             <div className="  text-blue-600 rounded-lg dark:bg-blue-900/30 dark:text-blue-400">
-              {/* Icon size menyesuaikan */}
-              <Image src={stocks} width={120}       // Minta Next.js merender gambar 120px (3x lebih tajam)
-                height={120}      // Sama, 120px
+              <Image src={stocks} width={120}    
+                height={120}     
                 alt='stocks logo'
                 className="w-10 h-10 object-contain"
               />
