@@ -1,65 +1,183 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import React, { useState } from 'react';
+import { 
+  Calculator, 
+  TrendingUp, 
+  BadgePercent, 
+  Wallet 
+} from 'lucide-react';
+
+import { Card, CardContent, CardDescription, CardHeader, CardFooter } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
+
+export default function DividendCalculator() {
+  const [lot, setLot] = useState<string>('');
+  const [dps, setDps] = useState<string>('');
+  const [tax, setTax] = useState<boolean>(true);
+
+  const formatRupiah = (num: number) => {
+    return new Intl.NumberFormat('id-ID', { 
+      style: 'currency', 
+      currency: 'IDR',
+      maximumFractionDigits: 0 
+    }).format(num);
+  };
+
+  const lotNum = parseFloat(lot) || 0;
+  const dpsNum = parseFloat(dps) || 0;
+  
+  const totalLembar = lotNum * 100;
+  const gross = totalLembar * dpsNum;
+  const taxAmount = tax ? gross * 0.1 : 0;
+  const net = gross - taxAmount;
+
+  const preventMinus = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (["-", "e", "E", "+"].includes(e.key)) {
+      e.preventDefault();
+    }
+  };
+
+  const handleInputChange = (value: string, setter: (val: string) => void) => {
+    if (value === '') {
+      setter('');
+      return;
+    }
+    const num = parseFloat(value);
+    if (!isNaN(num) && num >= 0) {
+      setter(value);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    // UBAHAN 1: Padding container menyesuaikan layar (p-4 di HP, md:p-8 di tablet/desktop)
+    <div className="flex min-h-screen items-center justify-center bg-zinc-50 p-4 md:p-8 dark:bg-zinc-950 transition-colors">
+      
+      {/* UBAHAN 2: Lebar Card lebih fleksibel */}
+      <Card className="w-full max-w-[340px] sm:max-w-md md:max-w-lg shadow-xl border-zinc-200 dark:border-zinc-800">
+        
+        <CardHeader className="space-y-1 pb-4">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="p-2 bg-blue-100 text-blue-600 rounded-lg dark:bg-blue-900/30 dark:text-blue-400">
+              {/* Icon size menyesuaikan */}
+              <Calculator className="w-5 h-5 md:w-6 md:h-6" />
+            </div>
+            {/* Font size judul adaptif */}
+            <h1 className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+              Kalkulator Dividen
+            </h1>
+          </div>
+          <CardDescription className="text-xs md:text-sm">
+            Hitung potensi cuan dividen saham kamu.
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="space-y-5 md:space-y-6">
+          {/* Input Section */}
+          <div className="space-y-4">
+            
+            {/* Input Lot */}
+            <div className="grid gap-2">
+              <Label htmlFor="lot" className="flex items-center gap-2 text-sm md:text-base">
+                <TrendingUp size={16} className="text-zinc-500" /> 
+                Jumlah Lot
+              </Label>
+              <div className="relative">
+                <Input
+                  id="lot"
+                  type="number"
+                  placeholder="0"
+                  value={lot}
+                  onKeyDownCapture={preventMinus}
+                  onChange={(e) => handleInputChange(e.target.value, setLot)}
+                  // Font size input diperbesar di desktop agar lebih jelas
+                  className="pl-4 pr-12 text-base md:text-lg font-medium h-10 md:h-11" 
+                />
+                <span className="absolute right-4 top-2.5 md:top-3 text-sm text-zinc-400">Lot</span>
+              </div>
+              <p className="text-[10px] md:text-xs text-zinc-500 text-right">
+                {formatRupiah(totalLembar).replace('Rp', '')} Lembar Saham
+              </p>
+            </div>
+
+            {/* Input DPS */}
+            <div className="grid gap-2">
+              <Label htmlFor="dps" className="flex items-center gap-2 text-sm md:text-base">
+                <Wallet size={16} className="text-zinc-500" />
+                Dividen Per Lembar
+              </Label>
+              <Input
+                id="dps"
+                type="number"
+                placeholder="Rp 0"
+                value={dps}
+                onKeyDownCapture={preventMinus}
+                onChange={(e) => handleInputChange(e.target.value, setDps)}
+                className="text-base md:text-lg font-medium h-10 md:h-11"
+              />
+            </div>
+
+            {/* Tax Switch */}
+            <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm bg-white dark:bg-zinc-900">
+              <div className="space-y-0.5">
+                <Label className="text-sm md:text-base flex items-center gap-2">
+                  <BadgePercent size={18} className="text-red-500" />
+                  Pajak Dividen
+                </Label>
+                <p className="text-[10px] md:text-xs text-zinc-500">
+                  Potongan PPh Final 10%
+                </p>
+              </div>
+              <Switch
+                checked={tax}
+                onCheckedChange={setTax}
+              />
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Result Section - Responsive Layout */}
+          <div className="space-y-3 bg-zinc-100/50 dark:bg-zinc-900/50 p-4 rounded-xl">
+            <div className="flex justify-between text-xs md:text-sm">
+              <span className="text-zinc-500">Total Dividen (Gross)</span>
+              <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                {formatRupiah(gross)}
+              </span>
+            </div>
+            
+            {tax && (
+              <div className="flex justify-between text-xs md:text-sm text-red-500/80">
+                <span>Pajak (10%)</span>
+                <span>- {formatRupiah(taxAmount)}</span>
+              </div>
+            )}
+
+            <div className="pt-2 mt-2 border-t border-zinc-200 dark:border-zinc-700">
+              {/* UBAHAN 3: Flex-col di HP, Flex-row di Desktop */}
+              {/* Ini mencegah angka panjang bertabrakan dengan teks "Dividen Bersih" di layar kecil */}
+              <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-end sm:justify-between">
+                <span className="text-sm font-semibold text-zinc-600 dark:text-zinc-400">
+                  Dividen Bersih
+                </span>
+                {/* Font size angka hasil membesar drastis di desktop */}
+                <span className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400 tracking-tight break-all">
+                  {formatRupiah(net)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+        
+        <CardFooter className="justify-center pb-6">
+          <p className="text-[10px] md:text-xs text-zinc-400 text-center">
+            *Estimasi berdasarkan data input manual
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+        </CardFooter>
+      </Card>
     </div>
   );
 }
